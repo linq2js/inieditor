@@ -1,0 +1,5 @@
+E:\Projects\IniEditor\Redux\bin\Debug\Redux.dll
+E:\Projects\IniEditor\Redux\bin\Debug\Redux.pdb
+E:\Projects\IniEditor\Redux\obj\Debug\Redux.csprojResolveAssemblyReference.cache
+E:\Projects\IniEditor\Redux\obj\Debug\Redux.dll
+E:\Projects\IniEditor\Redux\obj\Debug\Redux.pdb
