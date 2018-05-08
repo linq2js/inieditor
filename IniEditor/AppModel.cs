@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace IniEditor
 {
@@ -18,10 +19,16 @@ namespace IniEditor
 
         public HashSet<Action> Disposers = new HashSet<Action>();
 
-        public ConcurrentBag<LogEntry> Logs = new ConcurrentBag<LogEntry>();
-
-        public AnalyzingResult Analytics = new AnalyzingResult();
+        public List<LogEntry> Logs = new List<LogEntry>();
 
         public Guid FileVersion = Guid.NewGuid();
+
+        public InlineEditData InlineEdit;
+
+        public Task<AData> Analyzed = Task.FromResult(new AData());
+
+        public IDictionary<string, SectionStyle> SectionDetails = new Dictionary<string, SectionStyle>(StringComparer.OrdinalIgnoreCase);
+
+        public IDictionary<string, SectionGroup> SectionGroups = new Dictionary<string, SectionGroup>(StringComparer.OrdinalIgnoreCase);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using ScintillaNET;
@@ -7,7 +8,6 @@ namespace IniEditor
 {
     public class IniLexer
     {
-
         public delegate void TokenCollector(string token, int position, int type);
 
         public const int StyleDefault = 0;
@@ -19,6 +19,7 @@ namespace IniEditor
         public const int StyleNumber = 6;
         public const int StyleBoolean = 7;
         public const int StyleHeading = 8;
+        public const int StyleSubHeading = 9;
 
         public void Parse(string text, TokenCollector collect, int position = 0, bool exploreValues = true, CancellationTokenSource cts = null)
         {
@@ -52,7 +53,7 @@ namespace IniEditor
                     return;
                 }
                 Collect(m.Groups["mcomment"], StyleComment);
-                CollectDynamicStyle(m.Groups["comment"], s => s.Contains("***") ? StyleHeading : StyleComment);
+                Collect(m.Groups["comment"], StyleComment);
                 Collect(m.Groups["section"], StyleSection);
                 Collect(m.Groups["key"], StyleKey);
                 Collect(m.Groups["unknown"], StyleDefault);
@@ -76,6 +77,17 @@ namespace IniEditor
         {
             Parse(text, delegate(string token, int position, int type)
             {
+                if (type == StyleComment)
+                {
+                    if (token.Contains("***"))
+                    {
+                        type = StyleHeading;
+                    }
+                    else if (token.Contains("###"))
+                    {
+                        type = StyleSubHeading;
+                    }
+                }
                 scintilla.StartStyling(position);
                 scintilla.SetStyling(token.Length, type);
             }, pos, cts: cts);

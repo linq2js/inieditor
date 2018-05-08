@@ -7,20 +7,7 @@ namespace IniEditor
     {
         public string FullPath { get; }
 
-        public string Contents
-        {
-            get
-            {
-                var root = new XElement("project");
-
-                return root.ToString();
-            }
-
-            set
-            {
-                Changed = true;
-            }
-        }
+        public string Contents { get; set; }
 
         public Project(string fullPath)
         {

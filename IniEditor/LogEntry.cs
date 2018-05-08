@@ -6,6 +6,7 @@ namespace IniEditor
     public class LogEntry
     {
         public const int Heading = 50;
+        public const int Error = 51;
 
         public LogEntry(string contents, Action<Scintilla, int> formatter)
         {
@@ -16,5 +17,6 @@ namespace IniEditor
         public string Contents { get; }
 
         public Action<Scintilla, int> Formatter { get; }
+        
     }
 }

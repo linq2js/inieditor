@@ -1,7 +1,6 @@
 E:\Projects\IniEditor\IniEditor\bin\Debug\IniEditor.exe.config
 E:\Projects\IniEditor\IniEditor\bin\Debug\IniEditor.exe
 E:\Projects\IniEditor\IniEditor\bin\Debug\IniEditor.pdb
-E:\Projects\IniEditor\IniEditor\bin\Debug\MaterialSkin.dll
 E:\Projects\IniEditor\IniEditor\bin\Debug\ScintillaNET.dll
 E:\Projects\IniEditor\IniEditor\bin\Debug\ScintillaNET.xml
 E:\Projects\IniEditor\IniEditor\obj\Debug\IniEditor.csprojResolveAssemblyReference.cache
@@ -11,6 +10,7 @@ E:\Projects\IniEditor\IniEditor\obj\Debug\IniEditor.csproj.GenerateResource.Cach
 E:\Projects\IniEditor\IniEditor\obj\Debug\IniEditor.exe
 E:\Projects\IniEditor\IniEditor\obj\Debug\IniEditor.pdb
 E:\Projects\IniEditor\IniEditor\bin\Debug\DynamicExpresso.Core.dll
-E:\Projects\IniEditor\IniEditor\obj\Debug\IniEditor.GoTo.GoToDialog.resources
 E:\Projects\IniEditor\IniEditor\bin\Debug\Redux.dll
 E:\Projects\IniEditor\IniEditor\bin\Debug\Redux.pdb
+E:\Projects\IniEditor\IniEditor\obj\Debug\IniEditor.DiagramDialog.resources
+E:\Projects\IniEditor\IniEditor\obj\Debug\IniEditor.SectionDiagram.resources

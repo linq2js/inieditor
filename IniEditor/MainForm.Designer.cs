@@ -33,6 +33,7 @@
             this.fileItem = new System.Windows.Forms.ToolStripDropDownButton();
             this.newItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.closeItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.newProjectItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openProjectItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -41,18 +42,28 @@
             this.quitItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editItem = new System.Windows.Forms.ToolStripDropDownButton();
             this.findItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.quickSearchItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.replaceItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
             this.gotoLineItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gotoDeclarationItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.goBackItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.diagramItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.inlineEditItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearLogsItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
+            this.intelliSenseItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showTemplatesItem = new System.Windows.Forms.ToolStripMenuItem();
             this.logTextBox = new ScintillaNET.Scintilla();
             this.bottomSplitter = new System.Windows.Forms.Splitter();
             this.editorPanel = new System.Windows.Forms.Panel();
+            this.inlineEditPanel = new System.Windows.Forms.Panel();
+            this.inlineEditTextBox = new ScintillaNET.Scintilla();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.saveProjectDialog = new System.Windows.Forms.SaveFileDialog();
             this.openProjectDialog = new System.Windows.Forms.OpenFileDialog();
             this.statusToolbar = new System.Windows.Forms.ToolStrip();
-            this.statusLabel = new System.Windows.Forms.ToolStripLabel();
             this.replaceDropdown = new System.Windows.Forms.ToolStripSplitButton();
             this.replaceNextItem = new System.Windows.Forms.ToolStripMenuItem();
             this.replaceAllItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -82,7 +93,12 @@
             this.highlightMatchesItem = new System.Windows.Forms.ToolStripMenuItem();
             this.findTextBox = new System.Windows.Forms.ToolStripComboBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.statusLabel = new System.Windows.Forms.Label();
+            this.help = new System.Windows.Forms.HelpProvider();
+            this.projectOptionsItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainToolbar.SuspendLayout();
+            this.editorPanel.SuspendLayout();
+            this.inlineEditPanel.SuspendLayout();
             this.statusToolbar.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -98,7 +114,7 @@
             this.mainToolbar.Location = new System.Drawing.Point(0, 0);
             this.mainToolbar.Name = "mainToolbar";
             this.mainToolbar.Padding = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.mainToolbar.Size = new System.Drawing.Size(800, 25);
+            this.mainToolbar.Size = new System.Drawing.Size(1008, 25);
             this.mainToolbar.TabIndex = 0;
             // 
             // fileItem
@@ -107,10 +123,12 @@
             this.fileItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.newItem,
             this.openItem,
+            this.closeItem,
             this.toolStripMenuItem1,
             this.newProjectItem,
             this.openProjectItem,
             this.projectFilesItem,
+            this.projectOptionsItem,
             this.toolStripMenuItem2,
             this.quitItem});
             this.fileItem.Image = ((System.Drawing.Image)(resources.GetObject("fileItem.Image")));
@@ -134,6 +152,14 @@
             this.openItem.Size = new System.Drawing.Size(218, 22);
             this.openItem.Text = "&Open";
             this.openItem.Click += new System.EventHandler(this.openItem_Click);
+            // 
+            // closeItem
+            // 
+            this.closeItem.Name = "closeItem";
+            this.closeItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.W)));
+            this.closeItem.Size = new System.Drawing.Size(218, 22);
+            this.closeItem.Text = "Close";
+            this.closeItem.Click += new System.EventHandler(this.closeItem_Click);
             // 
             // toolStripMenuItem1
             // 
@@ -185,9 +211,18 @@
             this.editItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.editItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.findItem,
+            this.quickSearchItem,
+            this.replaceItem,
+            this.toolStripMenuItem5,
             this.gotoLineItem,
             this.gotoDeclarationItem,
-            this.clearLogsItem});
+            this.goBackItem,
+            this.diagramItem,
+            this.inlineEditItem,
+            this.clearLogsItem,
+            this.toolStripMenuItem4,
+            this.intelliSenseItem,
+            this.showTemplatesItem});
             this.editItem.Image = ((System.Drawing.Image)(resources.GetObject("editItem.Image")));
             this.editItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.editItem.Name = "editItem";
@@ -201,6 +236,27 @@
             this.findItem.Size = new System.Drawing.Size(206, 22);
             this.findItem.Text = "&Find";
             this.findItem.Click += new System.EventHandler(this.findItem_Click);
+            // 
+            // quickSearchItem
+            // 
+            this.quickSearchItem.Name = "quickSearchItem";
+            this.quickSearchItem.ShortcutKeys = System.Windows.Forms.Keys.F2;
+            this.quickSearchItem.Size = new System.Drawing.Size(206, 22);
+            this.quickSearchItem.Text = "&Quick Search";
+            this.quickSearchItem.Click += new System.EventHandler(this.quickSearchItem_Click);
+            // 
+            // replaceItem
+            // 
+            this.replaceItem.Name = "replaceItem";
+            this.replaceItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.H)));
+            this.replaceItem.Size = new System.Drawing.Size(206, 22);
+            this.replaceItem.Text = "&Replace";
+            this.replaceItem.Click += new System.EventHandler(this.replaceItem_Click);
+            // 
+            // toolStripMenuItem5
+            // 
+            this.toolStripMenuItem5.Name = "toolStripMenuItem5";
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(203, 6);
             // 
             // gotoLineItem
             // 
@@ -218,6 +274,30 @@
             this.gotoDeclarationItem.Text = "Go To &Declaration";
             this.gotoDeclarationItem.Click += new System.EventHandler(this.gotoDeclaration_Click);
             // 
+            // goBackItem
+            // 
+            this.goBackItem.Name = "goBackItem";
+            this.goBackItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.B)));
+            this.goBackItem.Size = new System.Drawing.Size(206, 22);
+            this.goBackItem.Text = "Go Back";
+            this.goBackItem.Click += new System.EventHandler(this.goBackItem_Click);
+            // 
+            // diagramItem
+            // 
+            this.diagramItem.Name = "diagramItem";
+            this.diagramItem.ShortcutKeys = System.Windows.Forms.Keys.F4;
+            this.diagramItem.Size = new System.Drawing.Size(206, 22);
+            this.diagramItem.Text = "Section Details";
+            this.diagramItem.Click += new System.EventHandler(this.diagramItem_Click);
+            // 
+            // inlineEditItem
+            // 
+            this.inlineEditItem.Name = "inlineEditItem";
+            this.inlineEditItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.E)));
+            this.inlineEditItem.Size = new System.Drawing.Size(206, 22);
+            this.inlineEditItem.Text = "Inline &Edit";
+            this.inlineEditItem.Click += new System.EventHandler(this.inlineEditItem_Click);
+            // 
             // clearLogsItem
             // 
             this.clearLogsItem.Name = "clearLogsItem";
@@ -226,44 +306,92 @@
             this.clearLogsItem.Text = "&Clear Logs";
             this.clearLogsItem.Click += new System.EventHandler(this.clearLogsItem_Click);
             // 
+            // toolStripMenuItem4
+            // 
+            this.toolStripMenuItem4.Name = "toolStripMenuItem4";
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(203, 6);
+            // 
+            // intelliSenseItem
+            // 
+            this.intelliSenseItem.Name = "intelliSenseItem";
+            this.intelliSenseItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Space)));
+            this.intelliSenseItem.Size = new System.Drawing.Size(206, 22);
+            this.intelliSenseItem.Text = "&IntelliSense";
+            this.intelliSenseItem.Click += new System.EventHandler(this.intelliSenseItem_Click);
+            // 
+            // showTemplatesItem
+            // 
+            this.showTemplatesItem.Name = "showTemplatesItem";
+            this.showTemplatesItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.T)));
+            this.showTemplatesItem.Size = new System.Drawing.Size(206, 22);
+            this.showTemplatesItem.Text = "Show &Templates";
+            this.showTemplatesItem.Click += new System.EventHandler(this.showTemplatesItem_Click);
+            // 
             // logTextBox
             // 
             this.logTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.logTextBox.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.logTextBox.Lexer = ScintillaNET.Lexer.PowerShell;
-            this.logTextBox.Location = new System.Drawing.Point(0, 415);
+            this.logTextBox.Location = new System.Drawing.Point(0, 391);
             this.logTextBox.Name = "logTextBox";
-            this.logTextBox.Size = new System.Drawing.Size(800, 185);
+            this.logTextBox.Size = new System.Drawing.Size(1008, 270);
             this.logTextBox.TabIndex = 1;
             this.logTextBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.logTextBox_MouseClick);
             // 
             // bottomSplitter
             // 
             this.bottomSplitter.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.bottomSplitter.Location = new System.Drawing.Point(0, 412);
+            this.bottomSplitter.Location = new System.Drawing.Point(0, 388);
             this.bottomSplitter.MinExtra = 150;
             this.bottomSplitter.MinSize = 150;
             this.bottomSplitter.Name = "bottomSplitter";
-            this.bottomSplitter.Size = new System.Drawing.Size(800, 3);
-            this.bottomSplitter.TabIndex = 2;
+            this.bottomSplitter.Size = new System.Drawing.Size(1008, 3);
+            this.bottomSplitter.TabIndex = 5;
             this.bottomSplitter.TabStop = false;
             // 
             // editorPanel
             // 
+            this.editorPanel.Controls.Add(this.inlineEditPanel);
             this.editorPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.editorPanel.Location = new System.Drawing.Point(0, 55);
             this.editorPanel.Name = "editorPanel";
-            this.editorPanel.Size = new System.Drawing.Size(800, 357);
-            this.editorPanel.TabIndex = 5;
+            this.editorPanel.Size = new System.Drawing.Size(1008, 333);
+            this.editorPanel.TabIndex = 3;
+            // 
+            // inlineEditPanel
+            // 
+            this.inlineEditPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.inlineEditPanel.BackColor = System.Drawing.Color.Silver;
+            this.inlineEditPanel.Controls.Add(this.inlineEditTextBox);
+            this.inlineEditPanel.Location = new System.Drawing.Point(590, 6);
+            this.inlineEditPanel.Name = "inlineEditPanel";
+            this.inlineEditPanel.Padding = new System.Windows.Forms.Padding(7);
+            this.inlineEditPanel.Size = new System.Drawing.Size(400, 308);
+            this.inlineEditPanel.TabIndex = 8;
+            this.inlineEditPanel.Visible = false;
+            // 
+            // inlineEditTextBox
+            // 
+            this.inlineEditTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.inlineEditTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.inlineEditTextBox.Location = new System.Drawing.Point(7, 7);
+            this.inlineEditTextBox.Margin = new System.Windows.Forms.Padding(0);
+            this.inlineEditTextBox.Margins.Capacity = 0;
+            this.inlineEditTextBox.Margins.Left = 0;
+            this.inlineEditTextBox.Margins.Right = 0;
+            this.inlineEditTextBox.Name = "inlineEditTextBox";
+            this.inlineEditTextBox.Size = new System.Drawing.Size(386, 294);
+            this.inlineEditTextBox.TabIndex = 0;
             // 
             // openFileDialog
             // 
-            this.openFileDialog.Filter = "INI File (*.ini)|*.ini";
+            this.openFileDialog.Filter = "INI File (*.ini)|*.ini|INI Definition File (*.inid)|*.inid";
             this.openFileDialog.Multiselect = true;
             // 
             // saveFileDialog
             // 
-            this.saveFileDialog.Filter = "INI File (*.ini)|*.ini";
+            this.saveFileDialog.Filter = "INI File (*.ini)|*.ini|INI Definition File (*.inid)|*.inid";
             // 
             // saveProjectDialog
             // 
@@ -278,7 +406,6 @@
             this.statusToolbar.BackColor = System.Drawing.Color.Transparent;
             this.statusToolbar.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.statusToolbar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.statusLabel,
             this.replaceDropdown,
             this.replaceTextBox,
             this.findDropdown,
@@ -287,16 +414,9 @@
             this.statusToolbar.Location = new System.Drawing.Point(0, 25);
             this.statusToolbar.Name = "statusToolbar";
             this.statusToolbar.Padding = new System.Windows.Forms.Padding(10, 0, 5, 0);
-            this.statusToolbar.Size = new System.Drawing.Size(800, 25);
-            this.statusToolbar.TabIndex = 6;
+            this.statusToolbar.Size = new System.Drawing.Size(1008, 25);
+            this.statusToolbar.TabIndex = 1;
             this.statusToolbar.Text = "s";
-            // 
-            // statusLabel
-            // 
-            this.statusLabel.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.statusLabel.Name = "statusLabel";
-            this.statusLabel.Size = new System.Drawing.Size(117, 22);
-            this.statusLabel.Text = "Document Title";
             // 
             // replaceDropdown
             // 
@@ -568,33 +688,56 @@
             // findTextBox
             // 
             this.findTextBox.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.findTextBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
             this.findTextBox.Name = "findTextBox";
-            this.findTextBox.Size = new System.Drawing.Size(150, 25);
+            this.findTextBox.Size = new System.Drawing.Size(250, 25);
             this.findTextBox.Text = "Find...";
             this.findTextBox.Enter += new System.EventHandler(this.findTextBox_Enter);
             this.findTextBox.Leave += new System.EventHandler(this.findTextBox_Leave);
             this.findTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.findTextBox_KeyDown);
+            this.findTextBox.TextChanged += new System.EventHandler(this.findTextBox_TextChanged);
             // 
             // panel1
             // 
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 50);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(800, 5);
+            this.panel1.Size = new System.Drawing.Size(1008, 5);
             this.panel1.TabIndex = 7;
+            // 
+            // statusLabel
+            // 
+            this.statusLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.statusLabel.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold);
+            this.statusLabel.Location = new System.Drawing.Point(12, 26);
+            this.statusLabel.Name = "statusLabel";
+            this.statusLabel.Size = new System.Drawing.Size(483, 23);
+            this.statusLabel.TabIndex = 2;
+            this.statusLabel.Text = "Document Title";
+            // 
+            // projectOptionsItem
+            // 
+            this.projectOptionsItem.Name = "projectOptionsItem";
+            this.projectOptionsItem.ShortcutKeys = System.Windows.Forms.Keys.F10;
+            this.projectOptionsItem.Size = new System.Drawing.Size(218, 22);
+            this.projectOptionsItem.Text = "Project Options";
+            this.projectOptionsItem.Click += new System.EventHandler(this.projectOptionsItem_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(800, 600);
+            this.ClientSize = new System.Drawing.Size(1008, 661);
+            this.Controls.Add(this.statusLabel);
             this.Controls.Add(this.editorPanel);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.bottomSplitter);
             this.Controls.Add(this.logTextBox);
             this.Controls.Add(this.statusToolbar);
             this.Controls.Add(this.mainToolbar);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(800, 600);
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -603,6 +746,8 @@
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.mainToolbar.ResumeLayout(false);
             this.mainToolbar.PerformLayout();
+            this.editorPanel.ResumeLayout(false);
+            this.inlineEditPanel.ResumeLayout(false);
             this.statusToolbar.ResumeLayout(false);
             this.statusToolbar.PerformLayout();
             this.ResumeLayout(false);
@@ -635,7 +780,6 @@
         private System.Windows.Forms.ToolStripMenuItem clearLogsItem;
         private System.Windows.Forms.ToolStripMenuItem gotoDeclarationItem;
         private System.Windows.Forms.ToolStrip statusToolbar;
-        private System.Windows.Forms.ToolStripLabel statusLabel;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
         private System.Windows.Forms.ToolStripMenuItem matchCaseItem;
         private System.Windows.Forms.ToolStripMenuItem wholeWordItem;
@@ -665,6 +809,21 @@
         private System.Windows.Forms.ToolStripMenuItem replaceAllCurrentFileItem;
         private System.Windows.Forms.ToolStripMenuItem replaceAllOpenedFilesItem;
         private System.Windows.Forms.ToolStripMenuItem replaceAllAllFilesItem;
+        private System.Windows.Forms.ToolStripMenuItem intelliSenseItem;
+        private System.Windows.Forms.Label statusLabel;
+        private System.Windows.Forms.ToolStripMenuItem replaceItem;
+        private System.Windows.Forms.ToolStripMenuItem closeItem;
+        private System.Windows.Forms.ToolStripMenuItem showTemplatesItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
+        private System.Windows.Forms.ToolStripMenuItem quickSearchItem;
+        private System.Windows.Forms.HelpProvider help;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem5;
+        private System.Windows.Forms.ToolStripMenuItem goBackItem;
+        private System.Windows.Forms.Panel inlineEditPanel;
+        private ScintillaNET.Scintilla inlineEditTextBox;
+        private System.Windows.Forms.ToolStripMenuItem inlineEditItem;
+        private System.Windows.Forms.ToolStripMenuItem diagramItem;
+        private System.Windows.Forms.ToolStripMenuItem projectOptionsItem;
     }
 }
 

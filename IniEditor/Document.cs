@@ -12,6 +12,8 @@ namespace IniEditor
 
         public Scintilla Editor { get; set; }
 
+        public int LastPosition { get; set; } = -1;
+
         public int Id { get; }
 
         public Deferred<Document> Ready { get; }

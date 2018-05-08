@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using ScintillaNET;
+using Timer = Redux.Timer;
 
 namespace IniEditor
 {
@@ -12,6 +14,8 @@ namespace IniEditor
 
         private readonly string _findDefaultText;
         private readonly string _replaceDefaultText;
+        private readonly Action _quickSearchThrottle;
+        private InlineEditData _inlineEditData;
 
         public MainForm()
         {
@@ -31,11 +35,34 @@ namespace IniEditor
             logTextBox.Styles[LogEntry.Heading].ForeColor = Color.Aqua;
             logTextBox.Styles[LogEntry.Heading].BackColor = Color.Black;
 
+            logTextBox.Styles[LogEntry.Error].ForeColor = Color.White;
+            logTextBox.Styles[LogEntry.Error].BackColor = Color.Red;
+
             logTextBox.SetSelectionBackColor(true, Color.Gray);
             logTextBox.SetSelectionForeColor(true, Color.Black);
 
             _findDefaultText = findTextBox.Text;
             _replaceDefaultText = replaceTextBox.Text;
+
+            _quickSearchThrottle = Timer.Throttle(200, QuickSearch, this);
+
+            inlineEditPanel.BackColor = Color.FromArgb(127, 0xca, 0xca, 0xca);
+            inlineEditTextBox.Configure(true);
+
+            HandleEscape(new Control[]
+                {
+                    logTextBox
+                },
+                new Action<KeyEventHandler>[]
+                {
+                    x => findTextBox.KeyDown += x,
+                    x => replaceTextBox.KeyDown += x
+                },
+                new Action<Action<Keys>>[]
+                {
+                    x => mainToolbar.PreviewKeyDown += (sender, e) => x(e.KeyCode),
+                    x => statusToolbar.PreviewKeyDown += (sender, e) => x(e.KeyCode)
+                });
 
             App.Instance.Init();
             App.Instance.Subscribe(this);
@@ -55,6 +82,7 @@ namespace IniEditor
 
         private void openItem_Click(object sender, EventArgs e)
         {
+            openFileDialog.FileName = string.Empty;
             if (openFileDialog.ShowDialog(this) == DialogResult.OK)
             {
                 foreach (var fileName in openFileDialog.FileNames)
@@ -66,6 +94,7 @@ namespace IniEditor
 
         private void openProjectItem_Click(object sender, EventArgs e)
         {
+            openProjectDialog.FileName = string.Empty;
             if (openProjectDialog.ShowDialog(this) == DialogResult.OK)
             {
                 App.Instance.LoadProject(openProjectDialog.FileName);
@@ -80,7 +109,6 @@ namespace IniEditor
                 x => x.Document,
                 (documents, document) =>
                 {
-
                     replaceAllOpenedFilesItem.Enabled =
                         replaceAllCurrentFileItem.Enabled =
                             replaceNextItem.Enabled =
@@ -155,12 +183,13 @@ namespace IniEditor
                             };
                             editor.UpdateUI += delegate
                             {
+                                if (!editor.Enabled) return;
                                 App.Instance.UpdateUi();
                             };
                             editorPanel.Controls.Add(editor);
 
                             // re-enable panel after editor is configured
-                            editor.Configure();
+                            editor.Configure(false);
 
                             App.Instance.EditorAdded(document, editor);
                         }
@@ -177,8 +206,11 @@ namespace IniEditor
                 x => x.Project,
                 x => x.Document,
                 x => x.Document?.Editor?.CurrentPosition ?? 0,
-                (project, document, position) =>
+                async (project, document, position) =>
                 {
+
+                    projectOptionsItem.Enabled = project != null;
+
                     var projectStatus = project == null ? null : Path.GetFileName(project.FullPath) + " | ";
                     string documentStatus = null;
 
@@ -186,7 +218,7 @@ namespace IniEditor
                     {
                         documentStatus = $"{Path.GetFileName(document.FullPath)}";
                         // find section from current position
-                        var sectionName = App.Instance.FindSection(position);
+                        var sectionName = await App.Instance.FindSection(position);
                         if (!string.IsNullOrWhiteSpace(sectionName))
                         {
                             documentStatus += " » " + sectionName;
@@ -212,6 +244,14 @@ namespace IniEditor
                             var start = logTextBox.TextLength;
                             foreach (var logEntry in App.Instance.PullLogs())
                             {
+                                if (logEntry.Contents.IgnoreCaseEqual("<clear>"))
+                                {
+                                    logTextBox.ClearAll();
+                                    logTextBox.RemoveAllData();
+                                    start = 0;
+                                    continue;
+                                }
+
                                 logTextBox.StartStyling(start);
                                 var date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss : ");
                                 logTextBox.AppendText(date);
@@ -235,6 +275,8 @@ namespace IniEditor
                                 logTextBox.Format(start, 2, Style.Default);
                                 start += 2;
                             }
+
+                            logTextBox.GotoPosition(logTextBox.TextLength);
                         });
                     }
                 });
@@ -242,11 +284,61 @@ namespace IniEditor
             // handle menu states for current document
             App.Instance.Subscribe(
                 x => x.Document?.Editor,
-                (editor) =>
+                editor =>
                 {
-                    currentFileItem.Enabled = gotoDeclarationItem.Enabled = gotoLineItem.Enabled = editor != null;
+                    diagramItem.Enabled =
+                        quickSearchItem.Enabled =
+                            inlineEditItem.Enabled =
+                                showTemplatesItem.Enabled =
+                                    goBackItem.Enabled =
+                                        closeItem.Enabled =
+                                            intelliSenseItem.Enabled =
+                                                currentFileItem.Enabled =
+                                                    gotoDeclarationItem.Enabled =
+                                                        gotoLineItem.Enabled =
+                                                            editor != null;
                 }
             );
+
+
+            inlineEditTextBox.KeyDown += (s, ee) =>
+            {
+                // dont close inline panel if user try to close autocomplete popup
+                if (ee.KeyCode == Keys.Escape && !inlineEditTextBox.AutoCActive)
+                {
+                    _inlineEditData.Close();
+                }
+            };
+
+            inlineEditTextBox.TextChanged += delegate
+            {
+                _inlineEditData?.Change(inlineEditTextBox.Text);
+            };
+
+            inlineEditTextBox.Leave += delegate
+            {
+                _inlineEditData.Close();
+            };
+
+            App.Instance.Subscribe(
+                x => x.InlineEdit,
+                inlineEditData =>
+                {
+                    if (inlineEditData != null)
+                    {
+                        _inlineEditData = inlineEditData;
+                        inlineEditTextBox.AddData(0, 0, EditorExtraDataType.InlineEdit, inlineEditData);
+                        inlineEditTextBox.Text = inlineEditData.Text;
+                        _inlineEditData.Changed = false;
+                        inlineEditPanel.Show();
+                        inlineEditTextBox.Focus();
+                    }
+                    else
+                    {
+                        inlineEditPanel.Hide();
+                        inlineEditTextBox.EmptyUndoBuffer();
+                    }
+                });
 
             if (CommandLineArgs?.Any() ?? false)
             {
@@ -289,7 +381,26 @@ namespace IniEditor
 
         private void gotoLineItem_Click(object sender, EventArgs e)
         {
-            App.Instance.GoToLine();
+            var currentLine = App.Instance.GetCurrentLine();
+            if (currentLine == -1) return;
+            SetQuickSearchQuery(currentLine.ToString(), "Enter line number");
+        }
+
+        private void SetQuickSearchQuery(string query, string helpText = null)
+        {
+            // save current position first
+            App.Instance.SavePosition();
+
+            findTextBox.Text = "?" + query;
+            findTextBox.Focus();
+            findTextBox.SelectionStart = 1;
+            findTextBox.SelectionLength = query.Length;
+
+            if (!string.IsNullOrWhiteSpace(helpText))
+            {
+                help.SetHelpString(statusLabel, helpText);
+                help.SetShowHelp(statusLabel, true);
+            }
         }
 
         private void gotoDeclaration_Click(object sender, EventArgs e)
@@ -298,9 +409,9 @@ namespace IniEditor
             {
                 var word = d.Editor.GetCurrentWord();
 
-                App.Instance.GoToDeclaration(word, d.Editor.CurrentPosition, data =>
+                App.Instance.GoToDeclaration(word, d.Editor.CurrentPosition, false, (data, @goto) =>
                 {
-                    d.Editor.AutoComplete(0, true, data).Then(x => App.Instance.GoTo(x));
+                    d.Editor.AutoComplete(0, true, data).Then(@goto);
                 });
             });
         }
@@ -325,6 +436,7 @@ namespace IniEditor
 
         private void newItem_Click(object sender, EventArgs e)
         {
+            saveFileDialog.FileName = string.Empty;
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 App.Instance.CreateDocument(saveFileDialog.FileName);
@@ -333,6 +445,7 @@ namespace IniEditor
 
         private void newProjectItem_Click(object sender, EventArgs e)
         {
+            saveProjectDialog.FileName = string.Empty;
             if (saveProjectDialog.ShowDialog() == DialogResult.OK)
             {
                 App.Instance.CreateProject(saveProjectDialog.FileName);
@@ -341,6 +454,8 @@ namespace IniEditor
 
         private void findItem_Click(object sender, EventArgs e)
         {
+            var selectedText = App.Instance.GetSelectedText();
+            findTextBox.Text = selectedText;
             findTextBox.Focus();
             findTextBox.Select();
         }
@@ -408,8 +523,6 @@ namespace IniEditor
             App.Instance.Replace(findTextBox.Text, replaceTextBox.Text, false, GetSearchOptions());
         }
 
-
-
         private void findTextBox_Enter(object sender, EventArgs e)
         {
 
@@ -419,12 +532,24 @@ namespace IniEditor
             }
         }
 
+        
         private void findTextBox_Leave(object sender, EventArgs e)
         {
+            if (findTextBox.Text.TrimStart().StartsWith("?"))
+            {
+                findTextBox.Text = string.Empty;
+            }
+
             if (string.IsNullOrWhiteSpace(findTextBox.Text))
             {
                 findTextBox.Text = _findDefaultText;
             }
+        }
+
+        private void QuickSearch()
+        {
+            var term = findTextBox.Text.Trim().TrimStart('?');
+            App.Instance.QuickSearch(term, logTextBox);
         }
 
         private void replaceTextBox_Leave(object sender, EventArgs e)
@@ -452,11 +577,11 @@ namespace IniEditor
                 switch (d.Type)
                 {
                     case EditorExtraDataType.OpenDocument:
-                        if (d.Data is AnalyzingResult.Location location)
+                        if (d.Data is AData.Location location)
                         {
                             App.Instance.LoadDocument(App.FilePath(location.FileId)).Ready.Then(x =>
                             {
-                                x.Editor.SetSel(location.Position, location.EndPosition);
+                                x.Editor.SetSelection(location.Position, location.EndPosition);
                             });
                         }
                         else
@@ -573,6 +698,102 @@ namespace IniEditor
             {
                 findDropdown_ButtonClick(findItem, e);
             }
+        }
+
+        private void intelliSenseItem_Click(object sender, EventArgs e)
+        {
+            App.Instance.Intellisense();
+        }
+
+        private void replaceItem_Click(object sender, EventArgs e)
+        {
+            var selectedText = App.Instance.GetSelectedText();
+            findTextBox.Text = selectedText;
+            replaceTextBox.Focus();
+            replaceTextBox.Select();
+        }
+
+        private void closeItem_Click(object sender, EventArgs e)
+        {
+            App.Instance.CloseDocument();
+        }
+
+        private void showTemplatesItem_Click(object sender, EventArgs e)
+        {
+            App.Instance.ShowTemplates();
+        }
+
+        private void findTextBox_TextChanged(object sender, EventArgs e)
+        {
+            if (findTextBox.Text.TrimStart().StartsWith("?"))
+            {
+                _quickSearchThrottle();
+            }
+        }
+
+        private void quickSearchItem_Click(object sender, EventArgs e)
+        {
+            SetQuickSearchQuery(string.Empty);
+        }
+
+        private void goBackItem_Click(object sender, EventArgs e)
+        {
+            App.Instance.GoBack();
+        }
+
+        private void inlineEditItem_Click(object sender, EventArgs e)
+        {
+            App.Instance.InlineEdit();
+        }
+
+        private static void HandleEscape(IEnumerable<Control> controls = null, Action<KeyEventHandler>[] keyEventRegisterActions = null, IEnumerable<Action<Action<Keys>>> keyActions = null)
+        {
+            void ProcessKeyCode(Keys keys)
+            {
+                if (keys == Keys.Escape)
+                {
+                    App.Instance.ActivateEditor();
+                }
+            }
+
+            void ProcessKeyDown(object sender, KeyEventArgs e)
+            {
+                ProcessKeyCode(e.KeyCode);
+            }
+
+            foreach (var control in controls ?? Enumerable.Empty<Control>())
+            {
+                control.KeyDown += ProcessKeyDown;
+            }
+
+            foreach (var keyEventRegisterAction in keyEventRegisterActions ?? Enumerable.Empty<Action<KeyEventHandler>>())
+            {
+                keyEventRegisterAction(ProcessKeyDown);
+            }
+
+            foreach (var action in keyActions ?? Enumerable.Empty<Action<Action<Keys>>>())
+            {
+                action(ProcessKeyCode);
+            }
+        }
+
+        private void diagramItem_Click(object sender, EventArgs e)
+        {
+            if (findTextBox.Focused)
+            {
+                var word = findTextBox.Text;
+                findTextBox.Text = string.Empty;
+                App.Instance.Diagram(word);
+            }
+            else
+            {
+                App.Instance.Diagram();
+            }
+        }
+
+        private void projectOptionsItem_Click(object sender, EventArgs e)
+        {
+            App.Instance.EditProject();
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Redux;
 
 namespace IniEditor
@@ -11,11 +10,6 @@ namespace IniEditor
             Timer.Interval(200, () =>
             {
                 var l = new List<IDocument>();
-
-                if (Model.Project != null)
-                {
-                    l.Add(Model.Project);
-                }
 
                 if (Model.Document != null)
                 {

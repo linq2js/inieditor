@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Redux;
 
 namespace IniEditor
 {
@@ -10,9 +12,24 @@ namespace IniEditor
             Log(logEntries.Select(x => new LogEntry(x, null)).ToArray());
         }
 
+        public void ClearLog()
+        {
+            Model.Logs.Add(new LogEntry("<clear>", null));
+        }
+
         public void LogHeading(string text)
         {
-            Log(new LogEntry(text, (x, i) => x.Format(i, text.Length, LogEntry.Heading)));
+            Log(text, LogEntry.Heading);
+        }
+
+        public void LogError(string text)
+        {
+            Log(text, LogEntry.Error);
+        }
+
+        private void Log(string text, int style)
+        {
+            Log(new LogEntry(text, (x, i) => x.Format(i, text.Length, style)));
         }
 
 
@@ -20,33 +37,19 @@ namespace IniEditor
         {
             if (logEntries.Length <= 0) return;
 
-            foreach (var logEntry in logEntries)
-            {
-                Model.Logs.Add(logEntry);
-            }
+            Model.Logs.AddRange(logEntries);
             Update();
         }
 
         public IEnumerable<LogEntry> PullLogs()
         {
-            var changed = false;
-            while (Model.Logs.Count > 0)
+            var result = Model.Logs.ToArray();
+            if (result.Length > 0)
             {
-                if (Model.Logs.TryTake(out LogEntry log))
-                {
-                    changed = true;
-                    yield return log;
-                }
-                else
-                {
-                    break;
-                }
+                Timer.Timeout(0, (Action) Update);
             }
-
-            if (changed)
-            {
-                Update();
-            }
+            Model.Logs.Clear();
+            return result;
         }
     }
 }

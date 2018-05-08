@@ -33,12 +33,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>INI.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="DynamicExpresso.Core, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\DynamicExpresso.Core.2.0.0\lib\net461\DynamicExpresso.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="MaterialSkin, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MaterialSkin.0.2.1\lib\MaterialSkin.dll</HintPath>
     </Reference>
     <Reference Include="ScintillaNET, Version=3.6.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\jacobslusser.ScintillaNET.3.6.3\lib\net40\ScintillaNET.dll</HintPath>
@@ -56,28 +56,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AnalyzingResult.cs" />
+    <Compile Include="AData.cs" />
     <Compile Include="App.Analyze.cs" />
     <Compile Include="App.AutoSave.cs" />
     <Compile Include="App.cs" />
     <Compile Include="App.Document.cs" />
-    <Compile Include="App.GoToLine.cs" />
     <Compile Include="App.IO.cs" />
     <Compile Include="App.Log.cs" />
     <Compile Include="App.Project.cs" />
     <Compile Include="AppModel.cs" />
+    <Compile Include="BlockType.cs" />
     <Compile Include="CharacterRange.cs" />
     <Compile Include="Defer.cs" />
-    <Compile Include="Document.cs" />
-    <Compile Include="FindReplaceAllMode.cs" />
-    <Compile Include="GoTo\GoToDialog.cs">
+    <Compile Include="DiagramDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GoTo\GoToDialog.Designer.cs">
-      <DependentUpon>GoToDialog.cs</DependentUpon>
+    <Compile Include="DiagramDialog.Designer.cs">
+      <DependentUpon>DiagramDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Document.cs" />
+    <Compile Include="FindReplaceAllMode.cs" />
     <Compile Include="IDocument.cs" />
     <Compile Include="IniLexer.cs" />
+    <Compile Include="IniWriter.cs" />
+    <Compile Include="InlineEditData.cs" />
     <Compile Include="LogEntry.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -85,16 +87,24 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MenuRenderer.cs" />
     <Compile Include="ObjectUtils.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SearchOptions.cs" />
+    <Compile Include="SectionBlock.cs" />
+    <Compile Include="SectionGroup.cs" />
+    <Compile Include="SectionStyle.cs" />
+    <Compile Include="SectionDiagram.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SectionDiagram.Designer.cs">
+      <DependentUpon>SectionDiagram.cs</DependentUpon>
+    </Compile>
     <Compile Include="StringUtils.cs" />
     <Compile Include="TextEditorStyleExtensions.cs" />
-    <EmbeddedResource Include="GoTo\GoToDialog.resx">
-      <DependentUpon>GoToDialog.cs</DependentUpon>
+    <EmbeddedResource Include="DiagramDialog.resx">
+      <DependentUpon>DiagramDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
@@ -109,6 +119,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="SectionDiagram.resx">
+      <DependentUpon>SectionDiagram.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -128,6 +141,9 @@
       <Project>{41BCB0D7-DD40-4073-A01A-3996DA4DD2ED}</Project>
       <Name>Redux</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="INI.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

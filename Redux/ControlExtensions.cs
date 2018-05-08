@@ -70,5 +70,19 @@ namespace Redux
             }
             return control;
         }
+
+        public static T SafeInvoke<T>(this T control, Action action) where T : Control
+        {
+            control.Invoke(action);
+            return control;
+        }
+
+        public static Action CreateSafeInvoke<T>(this T control, Action action) where T : Control
+        {
+            return delegate
+            {
+                control.Invoke(action);
+            };
+        }
     }
 }

@@ -16,7 +16,7 @@ namespace IniEditor
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            //Application.Run(new TestLexer());
+            //Application.Run(new DiagramDialog());
             Application.Run(new MainForm
             {
                 CommandLineArgs = args

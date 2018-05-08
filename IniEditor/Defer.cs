@@ -37,6 +37,11 @@ namespace IniEditor
 
     public static class DeferredExtensions
     {
+        public static IPromise<T> Then<T>(this Deferred<T> deferred, Action success, Action<Exception> fail = null)
+        {
+            return Then(deferred, x => success(), fail);
+        }
+
         public static IPromise<T> Then<T>(this Deferred<T> deferred, Action<T> success, Action<Exception> fail = null)
         {
             var promise = deferred.Then(x =>
